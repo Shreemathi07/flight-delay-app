@@ -2,89 +2,101 @@ import streamlit as st
 import pandas as pd
 import random
 
-st.set_page_config(page_title="AI Flight Delay System", page_icon="✈️", layout="centered")
+st.set_page_config(page_title="AI Flight Delay System", page_icon="✈️")
 
-# ---------- Background Image ----------
-st.markdown("""
-<style>
-
-.stApp {
-background-image: url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05");
-background-size: cover;
-background-position: center;
-}
-
-.login-box {
-background: rgba(0,0,0,0.75);
-padding: 40px;
-border-radius: 15px;
-width: 350px;
-margin:auto;
-color:white;
-}
-
-.title {
-text-align:center;
-font-size:40px;
-font-weight:bold;
-color:white;
-}
-
-.subtitle {
-text-align:center;
-color:white;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ---------- Users ----------
-users = {
-"admin":"flight123",
-"pilot":"sky456",
-"control":"tower789"
-}
+# -------- Session Storage --------
+if "users" not in st.session_state:
+    st.session_state.users = {"admin":"flight123"}
 
 if "login" not in st.session_state:
     st.session_state.login = False
 
+if "page" not in st.session_state:
+    st.session_state.page = "login"
 
-# ---------- LOGIN PAGE ----------
-if not st.session_state.login:
 
-    st.markdown('<div class="title">✈ AI Flight Delay System</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Aviation Delay Prediction Dashboard</div>', unsafe_allow_html=True)
+# -------- LOGIN BACKGROUND --------
+def login_background():
+    st.markdown("""
+    <style>
+    .stApp {
+    background-image: url("https://images.unsplash.com/photo-1504196606672-aef5c9cefc92");
+    background-size: cover;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    st.markdown('<div class="login-box">', unsafe_allow_html=True)
+
+# -------- DASHBOARD BACKGROUND --------
+def dashboard_background():
+    st.markdown("""
+    <style>
+    .stApp {
+    background-image: url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05");
+    background-size: cover;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+# ---------------- REGISTER PAGE ----------------
+if st.session_state.page == "register":
+
+    login_background()
+
+    st.title("✈ Create Account")
+
+    new_user = st.text_input("Create Username")
+    new_pass = st.text_input("Create Password", type="password")
+
+    if st.button("Register"):
+
+        if new_user in st.session_state.users:
+            st.error("User already exists")
+
+        else:
+            st.session_state.users[new_user] = new_pass
+            st.success("Account created successfully")
+
+    if st.button("Go to Login"):
+        st.session_state.page = "login"
+        st.rerun()
+
+
+# ---------------- LOGIN PAGE ----------------
+elif not st.session_state.login:
+
+    login_background()
+
+    st.title("✈ AI Flight Delay Prediction")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
     if st.button("Login"):
-        if username in users and users[username]==password:
+
+        if username in st.session_state.users and st.session_state.users[username] == password:
             st.session_state.login = True
-            st.success("Login successful")
             st.rerun()
+
         else:
-            st.error("Invalid username or password")
+            st.error("Invalid login")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("Register New Account"):
+        st.session_state.page = "register"
+        st.rerun()
 
 
-# ---------- MAIN DASHBOARD ----------
+# ---------------- DASHBOARD ----------------
 else:
+
+    dashboard_background()
 
     st.title("✈ Flight Delay Prediction Dashboard")
 
-    st.write("Enter flight information to predict possible delay.")
-
     airport = st.selectbox(
-        "Departure Airport",
-        ["Chennai International Airport",
-        "Delhi Airport",
-        "Mumbai Airport",
-        "Bangalore Airport",
-        "Hyderabad Airport"]
+        "Airport",
+        ["Chennai","Delhi","Mumbai","Bangalore","Hyderabad"]
     )
 
     airline = st.selectbox(
@@ -94,27 +106,33 @@ else:
 
     weather = st.selectbox(
         "Weather Condition",
-        ["Clear","Rain","Fog","Storm"]
+        ["Clear","Rain","Storm","Fog"]
     )
 
     departure = st.slider("Departure Hour",0,23)
 
-    if st.button("Predict Flight Delay"):
+    if st.button("Predict Delay"):
 
         delay = random.randint(0,100)
 
         st.subheader("Prediction Result")
 
         if delay > 60:
-            st.error(f"⚠ High Delay Probability : {delay}%")
+            st.error(f"⚠ High Delay Probability: {delay}%")
+
         elif delay > 30:
-            st.warning(f"Moderate Delay Probability : {delay}%")
+            st.warning(f"Moderate Delay Probability: {delay}%")
+
         else:
-            st.success(f"Low Delay Probability : {delay}%")
+            st.success(f"Low Delay Probability: {delay}%")
 
         chart = pd.DataFrame({
-        "Status":["Delay","On Time"],
-        "Percentage":[delay,100-delay]
+            "Status":["Delay","On Time"],
+            "Percentage":[delay,100-delay]
         })
 
         st.bar_chart(chart.set_index("Status"))
+
+    if st.button("Logout"):
+        st.session_state.login = False
+        st.rerun()
