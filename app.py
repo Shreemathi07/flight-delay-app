@@ -15,51 +15,37 @@ if "page" not in st.session_state:
     st.session_state.page = "login"
 
 
-# -------- LOGIN BACKGROUND (ONLY AIRPLANE CLEAN) --------
-def login_bg():
-    st.markdown("""
+# -------- ONLY AIRPLANE BACKGROUND --------
+def set_bg(image_url):
+    st.markdown(f"""
     <style>
-    .stApp {
-        background-image: url("https://images.unsplash.com/photo-1502920917128-1aa500764cbd");
+    .stApp {{
+        background-image: url("{image_url}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-    }
+    }}
 
-    .block-container {
-        background: rgba(0,0,0,0.65);
+    .block-container {{
+        background: rgba(0,0,0,0.6);
         padding: 40px;
         border-radius: 15px;
         max-width: 400px;
         margin: auto;
-    }
+    }}
 
-    h1, h2, h3, label {
+    h1, h2, h3, label {{
         color: white;
         text-align: center;
-    }
-
+    }}
     </style>
     """, unsafe_allow_html=True)
 
 
-# -------- DASHBOARD BACKGROUND (AIRPLANE) --------
-def dashboard_bg():
-    st.markdown("""
-    <style>
-    .stApp {
-        background-image: url("https://images.unsplash.com/photo-1494415859740-21e878dd929d");
-        background-size: cover;
-        background-position: center;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
-# -------- REGISTER PAGE --------
+# -------- REGISTER --------
 if st.session_state.page == "register":
 
-    login_bg()
+    set_bg("https://images.unsplash.com/photo-1502920917128-1aa500764cbd")
 
     st.title("✈ Create Account")
 
@@ -78,10 +64,10 @@ if st.session_state.page == "register":
         st.rerun()
 
 
-# -------- LOGIN PAGE --------
+# -------- LOGIN --------
 elif not st.session_state.login:
 
-    login_bg()
+    set_bg("https://images.unsplash.com/photo-1502920917128-1aa500764cbd")
 
     st.title("✈ Flight Delay System")
 
@@ -93,7 +79,7 @@ elif not st.session_state.login:
             st.session_state.login = True
             st.rerun()
         else:
-            st.error("Invalid login")
+            st.error("Invalid Username or Password")
 
     if st.button("Create Account"):
         st.session_state.page = "register"
@@ -103,7 +89,7 @@ elif not st.session_state.login:
 # -------- DASHBOARD --------
 else:
 
-    dashboard_bg()
+    set_bg("https://images.unsplash.com/photo-1494415859740-21e878dd929d")
 
     st.title("✈ Flight Delay Dashboard")
 
@@ -130,7 +116,7 @@ else:
 
         delay = random.randint(0, 100)
 
-        st.subheader("Result")
+        st.subheader("Prediction Result")
         st.progress(delay)
 
         if delay > 60:
