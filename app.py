@@ -77,7 +77,8 @@ else:
             "Delay Probability":[delay,100-delay]
         },index=["Delay","On Time"])
 
-        st.bar_chart(chart)import streamlit as st
+        st.bar_chart(chart)
+import streamlit as st        
 import pandas as pd
 import random
 import matplotlib.pyplot as plt
