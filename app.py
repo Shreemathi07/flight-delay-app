@@ -4,7 +4,7 @@ import random
 
 st.set_page_config(page_title="AI Flight Delay System", page_icon="✈️")
 
-# -------- Session Storage --------
+# -------- SESSION STORAGE --------
 if "users" not in st.session_state:
     st.session_state.users = {"admin":"flight123"}
 
@@ -15,13 +15,14 @@ if "page" not in st.session_state:
     st.session_state.page = "login"
 
 
-# -------- LOGIN BACKGROUND --------
+# -------- LOGIN BACKGROUND (LIGHT AI STYLE) --------
 def login_background():
     st.markdown("""
     <style>
     .stApp {
-    background-image: url("https://images.unsplash.com/photo-1504196606672-aef5c9cefc92");
+    background-image: url("https://images.unsplash.com/photo-1519125323398-675f0ddb6308");
     background-size: cover;
+    background-position: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -34,17 +35,18 @@ def dashboard_background():
     .stApp {
     background-image: url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05");
     background-size: cover;
+    background-position: center;
     }
     </style>
     """, unsafe_allow_html=True)
 
 
-# ---------------- REGISTER PAGE ----------------
+# -------- REGISTER PAGE --------
 if st.session_state.page == "register":
 
     login_background()
 
-    st.title("✈ Create Account")
+    st.title("✈ Create Your Account")
 
     new_user = st.text_input("Create Username")
     new_pass = st.text_input("Create Password", type="password")
@@ -58,17 +60,17 @@ if st.session_state.page == "register":
             st.session_state.users[new_user] = new_pass
             st.success("Account created successfully")
 
-    if st.button("Go to Login"):
+    if st.button("Back to Login"):
         st.session_state.page = "login"
         st.rerun()
 
 
-# ---------------- LOGIN PAGE ----------------
+# -------- LOGIN PAGE --------
 elif not st.session_state.login:
 
     login_background()
 
-    st.title("✈ AI Flight Delay Prediction")
+    st.title("✈ AI Flight Delay Prediction System")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
@@ -87,17 +89,26 @@ elif not st.session_state.login:
         st.rerun()
 
 
-# ---------------- DASHBOARD ----------------
+# -------- DASHBOARD --------
 else:
 
     dashboard_background()
 
     st.title("✈ Flight Delay Prediction Dashboard")
 
-    airport = st.selectbox(
-        "Airport",
-        ["Chennai","Delhi","Mumbai","Bangalore","Hyderabad"]
-    )
+    col1, col2 = st.columns(2)
+
+    with col1:
+        departure_airport = st.selectbox(
+            "Departure Airport",
+            ["Chennai","Delhi","Mumbai","Bangalore","Hyderabad"]
+        )
+
+    with col2:
+        arrival_airport = st.selectbox(
+            "Arrival Airport",
+            ["Dubai","Singapore","London","New York","Tokyo"]
+        )
 
     airline = st.selectbox(
         "Airline",
@@ -109,26 +120,32 @@ else:
         ["Clear","Rain","Storm","Fog"]
     )
 
-    departure = st.slider("Departure Hour",0,23)
+    flight_date = st.date_input("Flight Date")
 
-    if st.button("Predict Delay"):
+    departure_hour = st.slider("Departure Hour",0,23)
 
-        delay = random.randint(0,100)
+    if st.button("Predict Flight Delay"):
+
+        delay_probability = random.randint(0,100)
 
         st.subheader("Prediction Result")
 
-        if delay > 60:
-            st.error(f"⚠ High Delay Probability: {delay}%")
+        st.progress(delay_probability)
 
-        elif delay > 30:
-            st.warning(f"Moderate Delay Probability: {delay}%")
-
+        if delay_probability > 60:
+            st.error(f"⚠ High Delay Probability: {delay_probability}%")
+        elif delay_probability > 30:
+            st.warning(f"Moderate Delay Probability: {delay_probability}%")
         else:
-            st.success(f"Low Delay Probability: {delay}%")
+            st.success(f"Low Delay Probability: {delay_probability}%")
+
+        estimated_delay = random.randint(5,120)
+
+        st.info(f"Estimated Delay Time: {estimated_delay} minutes")
 
         chart = pd.DataFrame({
             "Status":["Delay","On Time"],
-            "Percentage":[delay,100-delay]
+            "Percentage":[delay_probability,100-delay_probability]
         })
 
         st.bar_chart(chart.set_index("Status"))
